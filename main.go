@@ -4,10 +4,12 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/torcuata22/rest_api/db"
 	"github.com/torcuata22/rest_api/models"
 )
 
 func main() {
+	db.InitDB()
 	server := gin.Default()
 	server.GET("/events", getEvents)
 	server.POST("/events", createEvent)

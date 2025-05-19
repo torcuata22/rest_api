@@ -19,7 +19,10 @@ func createTables() {
 			user_id INTEGER
 		);
 	`
-	DB.Exec(createEventsTable)
+	_, err := DB.Exec(createEventsTable)
+	if err != nil {
+		panic("Could not create events table.")
+	}
 }
 
 func InitDB() {
