@@ -77,6 +77,21 @@ func GetEventById(id int64) (*Event, error) {
 	return &event, nil
 }
 
+func (event Event) Update(id int64) error {
+	query := `
+	UPDATE events
+	SET name = ?, description = ?, location = ?, date_time = ?, user_id = ?
+	WHERE id = ?
+	`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(event.Name, event.Description, event.Location, event.DateTime, event.UserID, id)
+	return err
+}
+
 //.Exec() is used to execute a query that changes things
 //.Query() is used to run a query that returns several rows of data
 //.QueryRow returns only one row (there is only one row for id)
