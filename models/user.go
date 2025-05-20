@@ -1,6 +1,8 @@
 package models
 
 import (
+	"errors"
+
 	"github.com/torcuata22/rest_api/db"
 	"github.com/torcuata22/rest_api/utils"
 )
@@ -32,4 +34,23 @@ func (u *User) Save() error {
 
 	u.ID = userId
 	return err
+}
+
+func (u User) ValidateCredentials() error {
+	query := `SELECT password from users WHERE email = ?`
+	row := db.DB.QueryRow(query, u.Email)
+
+	var retrievedPassword string
+	err := row.Scan(&retrievedPassword)
+	if err != nil {
+		return errors.New("credentials are invalid")
+
+	}
+	//compare password in request to password in db (hashed)
+	passwordIsValid := utils.CheckPasswordHash(u.Password, retrievedPassword)
+
+	if !passwordIsValid {
+		return errors.New("credentials are invalid")
+	}
+	return nil
 }
