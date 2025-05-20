@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/torcuata22/rest_api/models"
+	"github.com/torcuata22/rest_api/utils"
 )
 
 func signup(context *gin.Context) {
@@ -36,5 +37,13 @@ func login(context *gin.Context) {
 		context.JSON(http.StatusUnauthorized, gin.H{"error": "Could not authenticate user credentials"})
 		return
 	}
-	context.JSON(http.StatusOK, gin.H{"message": "User logged in!"})
+
+	//generate JWT
+	token, err := utils.GenerateToken(user.Email, user.ID)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "User logged in!", "token": token})
 }

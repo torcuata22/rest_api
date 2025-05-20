@@ -2,6 +2,7 @@ package models
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/torcuata22/rest_api/db"
 	"github.com/torcuata22/rest_api/utils"
@@ -37,12 +38,14 @@ func (u *User) Save() error {
 }
 
 func (u User) ValidateCredentials() error {
-	query := `SELECT password from users WHERE email = ?`
+	fmt.Println("Validating credentials")
+	query := `SELECT id, password from users WHERE email = ?`
 	row := db.DB.QueryRow(query, u.Email)
 
 	var retrievedPassword string
-	err := row.Scan(&retrievedPassword)
+	err := row.Scan(&u.ID, &retrievedPassword)
 	if err != nil {
+		fmt.Println("Error scanning row: ", err)
 		return errors.New("credentials are invalid")
 
 	}
@@ -50,7 +53,9 @@ func (u User) ValidateCredentials() error {
 	passwordIsValid := utils.CheckPasswordHash(u.Password, retrievedPassword)
 
 	if !passwordIsValid {
+		fmt.Println("Invalid Password: ", err)
 		return errors.New("credentials are invalid")
 	}
+	fmt.Println("Credentials are valid")
 	return nil
 }
