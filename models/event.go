@@ -92,6 +92,18 @@ func (event Event) Update(id int64) error {
 	return err
 }
 
+func (event Event) Delete() error {
+	query := `DELETE FROM events WHERE id = ?`
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(event.ID)
+	return err
+
+}
+
 //.Exec() is used to execute a query that changes things
 //.Query() is used to run a query that returns several rows of data
 //.QueryRow returns only one row (there is only one row for id)

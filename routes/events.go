@@ -1,7 +1,6 @@
 package routes
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -75,9 +74,6 @@ func updateEvent(context *gin.Context) {
 	}
 
 	updatedEvent.ID = eventId
-	fmt.Println("UPDATED EVENT", updatedEvent)
-	fmt.Println("UPDATED EVENT ID", updatedEvent.ID)
-	fmt.Println("EVENT ID", eventId)
 	err = updatedEvent.Update(eventId)
 
 	if err != nil {
@@ -89,4 +85,22 @@ func updateEvent(context *gin.Context) {
 
 }
 
-func deleteEvent(context *gin.Context) {}
+func deleteEvent(context *gin.Context) {
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+	if err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse event id"})
+		return
+	}
+	event, err := models.GetEventById(eventId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not fetch event by id"})
+		return
+	}
+	err = event.Delete()
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not delete event"})
+		return
+	}
+
+	context.JSON(http.StatusOK, gin.H{"message": "Event deleted!"})
+}
