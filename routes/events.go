@@ -17,30 +17,9 @@ func getEvents(context *gin.Context) {
 	context.JSON(http.StatusOK, events)
 }
 
-// needs to be authenticated (check for Token)
+// needs to be authenticated (check for Token), auth is now done in the routes (through a group)
 func createEvent(context *gin.Context) {
-	// token := context.Request.Header.Get("Authorization")
-	// if token == "" {
-	// 	context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
-	// 	return
-	// }
 
-	// // Check and strip Bearer prefix
-	// const prefix = "Bearer "
-	// if len(token) <= len(prefix) || token[:len(prefix)] != prefix {
-	// 	context.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token format"})
-	// 	return
-	// }
-	// token = token[len(prefix):]
-
-	// // Verify token
-	// userId, err := utils.VerifyToken(token)
-	// if err != nil {
-	// 	context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized", "error": err.Error()})
-	// 	return
-	// }
-
-	//use Authenticate() middleware
 	var event models.Event
 	err := context.ShouldBindJSON(&event)
 	if err != nil {

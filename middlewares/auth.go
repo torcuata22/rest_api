@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -8,9 +9,10 @@ import (
 )
 
 func Authenticate(context *gin.Context) {
+	fmt.Println("Authenticate middleware called")
 	token := context.Request.Header.Get("Authorization")
 	if token == "" {
-		context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		context.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
 		return
 	}
 

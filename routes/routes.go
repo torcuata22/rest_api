@@ -8,10 +8,17 @@ import (
 func RegisterRoutes(server *gin.Engine) {
 	server.GET("/events", getEvents)
 	server.GET("/events/:id", getEvent)
-	server.POST("/events", middlewares.Authenticate, createEvent) //protected
-	server.PUT("/events/:id", updateEvent)
-	server.DELETE("/events/:id", deleteEvent)
+
+	authenticated := server.Group("/")          //creates a new group
+	authenticated.Use(middlewares.Authenticate) //always runs middleware before handlers
+	authenticated.POST("/events", createEvent)
+	authenticated.PUT("/events/:id", updateEvent)
+	authenticated.DELETE("/events/:id", deleteEvent)
+
 	server.POST("/signup", signup)
 	server.POST("/login", login)
 
 }
+
+//Individual implementation of middleware and auth:
+//	server.POST("/events", middlewares.Authenticate, createEvent) //protected and runs Authenticate() midleware BEFORE the handler
