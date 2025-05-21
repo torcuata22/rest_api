@@ -37,7 +37,7 @@ func (u *User) Save() error {
 	return err
 }
 
-func (u User) ValidateCredentials() error {
+func (u *User) ValidateCredentials() error {
 	fmt.Println("Validating credentials")
 	query := `SELECT id, password from users WHERE email = ?`
 	row := db.DB.QueryRow(query, u.Email)

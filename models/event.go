@@ -15,10 +15,10 @@ type Event struct {
 	UserID      int64
 }
 
-var events = []Event{}
+// var events = []Event{}
 
 // Methods:
-func (e Event) Save() error {
+func (e *Event) Save() error {
 	query := `INSERT INTO events (name, description, location, date_time, user_id) 
 	VALUES (?, ?, ?, ?, ?)`
 	stmt, err := db.DB.Prepare(query)
@@ -28,7 +28,7 @@ func (e Event) Save() error {
 	}
 
 	result, err := stmt.Exec(e.Name, e.Description, e.Location, e.DateTime, e.UserID)
-	events = append(events, e)
+	// events = append(events, e)
 	if err != nil {
 		return err
 	}
@@ -37,7 +37,7 @@ func (e Event) Save() error {
 	id, err := result.LastInsertId()
 
 	e.ID = id
-	events = append(events, e)
+	// events = append(events, e)
 	return err
 
 }
