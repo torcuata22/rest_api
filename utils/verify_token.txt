@@ -1,0 +1,92 @@
+
+
+Here is a step-by-step explanation of the `VerifyToken` function:
+
+**Function Signature**
+```go
+func VerifyToken(token string) {
+```
+* This is a Go function named `VerifyToken` that takes a single argument `token` of type `string`.
+
+**JWT Parsing**
+```go
+jwt.Parse(token, func(token *jwt.Token) (any, error) {
+```
+* The function uses the `jwt.Parse` function from the `github.com/dgrijalva/jwt-go` library to parse the provided `token` string.
+* The second argument to `jwt.Parse` is a callback function that will be executed with the parsed token.
+
+**Callback Function**
+```go
+(token *jwt.Token) (any, error) {
+```
+* This is the callback function that will be executed with the parsed token.
+* The function takes a `*jwt.Token` pointer as an argument and returns two values: an `any` value (which can be any type) and an `error`.
+
+**Signing Method Verification**
+```go
+_, ok := token.Method.(*jwt.SigningMethodHMAC)
+if !ok {
+    return nil, errors.New("unexpected signing method")
+}
+```
+* The function checks the signing method used to sign the token by accessing the `Method` field of the `jwt.Token` struct.
+* It uses a type assertion to check if the signing method is an instance of `*jwt.SigningMethodHMAC`. If it is not, it returns an error with the message "unexpected signing method".
+
+**Returning Secret Key**
+```go
+return secretKey, nil
+```
+* If the signing method is valid, the function returns the `secretKey` value (which is not defined in this code snippet) and a `nil` error.
+
+**Note**: The `secretKey` variable is not defined in this code snippet, so it's assumed to be defined elsewhere in the codebase. The purpose of returning the `secretKey` is likely to use it for further verification or validation of the token.
+
+Overall, this function verifies that a provided token was signed with the expected signing method (HMAC) and returns the secret key used for signing if the verification succeeds.
+
+WORD OF CAUTION ABOUT "Bearer"
+Absolutely! Here's a clear explanation you can include in your documentation or comments to explain **why and how** the `"Bearer "` prefix is removed from the token:
+
+---
+
+### 🛡️ Why We Remove the `"Bearer "` Prefix from the Token
+
+When a client sends a JWT (JSON Web Token) in an HTTP request to an authenticated route, it is usually included in the `Authorization` header in the following format:
+
+```
+Authorization: Bearer <token>
+```
+
+The word **"Bearer "** is part of the standard convention for passing access tokens, and it indicates that the token that follows is a bearer token — meaning the bearer of the token is authorized to access the resource.
+
+However, when parsing or verifying the token, libraries like `github.com/golang-jwt/jwt/v5` expect **only the raw token string**, not the full header value. If we pass the entire string `"Bearer <token>"` to the JWT parser, it will fail because it's not a valid token format.
+
+### 🧼 Solution
+
+We extract and remove the `"Bearer "` prefix from the header value before verifying the token. This leaves us with just the JWT string.
+
+---
+
+### ✅ Example in Code
+
+```go
+authHeader := context.Request.Header.Get("Authorization")
+
+// Expected format: "Bearer <token>"
+const prefix = "Bearer "
+if len(authHeader) <= len(prefix) || authHeader[:len(prefix)] != prefix {
+	context.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token format"})
+	return
+}
+
+token := authHeader[len(prefix):] // Removes "Bearer " and keeps just the token
+```
+
+---
+
+This ensures that we pass a clean token string to our `VerifyToken` function, avoiding errors like:
+
+```
+could not parse token
+invalid token format
+```
+
+Let me know if you'd like me to help make this a reusable middleware too!

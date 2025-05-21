@@ -6,9 +6,11 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/torcuata22/rest_api/models"
+	"github.com/torcuata22/rest_api/utils"
 )
 
 func getEvents(context *gin.Context) {
+	//check token is present
 	events, err := models.GetAllEvents()
 	if err != nil {
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not get events"})
@@ -16,10 +18,31 @@ func getEvents(context *gin.Context) {
 	context.JSON(http.StatusOK, events)
 }
 
+// needs to be authenticated (check for Token)
 func createEvent(context *gin.Context) {
-	var event models.Event
-	err := context.ShouldBindJSON(&event)
+	token := context.Request.Header.Get("Authorization")
+	if token == "" {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized"})
+		return
+	}
 
+	// Check and strip Bearer prefix
+	const prefix = "Bearer "
+	if len(token) <= len(prefix) || token[:len(prefix)] != prefix {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Invalid token format"})
+		return
+	}
+	token = token[len(prefix):]
+
+	// Verify token
+	err := utils.VerifyToken(token)
+	if err != nil {
+		context.JSON(http.StatusUnauthorized, gin.H{"message": "Unauthorized", "error": err.Error()})
+		return
+	}
+
+	var event models.Event
+	err = context.ShouldBindJSON(&event)
 	if err != nil {
 		context.JSON(http.StatusBadRequest, gin.H{"error": "Could not parse event"})
 		return
@@ -35,7 +58,6 @@ func createEvent(context *gin.Context) {
 	}
 
 	context.JSON(http.StatusCreated, gin.H{"message": "Event created!", "event": event})
-
 }
 
 func getEvent(context *gin.Context) {

@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"fmt"
 	"net/http"
+
 	//"strconv"
 
 	"github.com/gin-gonic/gin"
@@ -41,6 +43,7 @@ func login(context *gin.Context) {
 	//generate JWT
 	token, err := utils.GenerateToken(user.Email, user.ID)
 	if err != nil {
+		fmt.Println("Error generating token:", err)
 		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 		return
 	}
