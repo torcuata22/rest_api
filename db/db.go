@@ -36,6 +36,21 @@ func createTables() {
 	if err != nil {
 		panic("Could not create events table.")
 	}
+
+	createRegistrationsTable := `
+		CREATE TABLE IF NOT EXISTS registrations (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			event_id INTEGER NOT NULL,
+			user_id INTEGER NOT NULL,
+			FOREIGN KEY(event_id) REFERENCES events(id),
+			FOREIGN KEY(user_id) REFERENCES users(id),
+			UNIQUE(event_id, user_id) -- ensures a user can only register once for an event
+	);
+	`
+	_, err = DB.Exec(createEventsTable)
+	if err != nil {
+		panic("Could not create registrations table.")
+	}
 }
 
 func InitDB() {
