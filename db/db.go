@@ -47,7 +47,7 @@ func createTables() {
 			UNIQUE(event_id, user_id) -- ensures a user can only register once for an event
 	);
 	`
-	_, err = DB.Exec(createEventsTable)
+	_, err = DB.Exec(createRegistrationsTable)
 	if err != nil {
 		panic("Could not create registrations table.")
 	}
