@@ -30,4 +30,16 @@ func registerForEvent(context *gin.Context) {
 	context.JSON(http.StatusCreated, gin.H{"message": "Registered!", "event": event})
 }
 
-func unregisterFromEvent(context *gin.Context) {}
+func cancelRegistration(context *gin.Context) {
+	userId := context.GetInt64("userId")
+	eventId, err := strconv.ParseInt(context.Param("id"), 10, 64)
+
+	var event models.Event
+	event.ID = eventId
+	err = event.CancelRegistration(userId)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Could not cancel registration  for event"})
+		return
+	}
+	context.JSON(http.StatusOK, gin.H{"message": "Registration cancelled!", "event": event})
+}

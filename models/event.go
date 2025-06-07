@@ -117,6 +117,17 @@ func (e Event) Register(userId int64) error {
 	return err
 }
 
+func (e Event) CancelRegistration(userId int64) error {
+	query := "DELETE FROM registrations WHERE event_id = ? AND user_id = ?"
+	stmt, err := db.DB.Prepare(query)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	_, err = stmt.Exec(e.ID, userId)
+	return err
+}
+
 //.Exec() is used to execute a query that changes things
 //.Query() is used to run a query that returns several rows of data
 //.QueryRow returns only one row (there is only one row for id)
