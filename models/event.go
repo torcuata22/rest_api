@@ -104,6 +104,19 @@ func (event Event) Delete() error {
 
 }
 
+func (e Event) Register(userId int64) error {
+	query := "INSERT INTO registrations(event_id, user_id) VALUES (?, ?)"
+	stmt, err := db.DB.Prepare(query)
+
+	if err != nil {
+		return err
+	}
+
+	defer stmt.Close()
+	_, err = stmt.Exec(e.ID, userId)
+	return err
+}
+
 //.Exec() is used to execute a query that changes things
 //.Query() is used to run a query that returns several rows of data
 //.QueryRow returns only one row (there is only one row for id)
